@@ -5,5 +5,5 @@ from . import views
 app_name = 'core'
 
 urlpatterns = [
-    path('', views.item_list, name='item-list'),
+    path('', views.ItemListView.as_view(), name='item-list'),
 ]
