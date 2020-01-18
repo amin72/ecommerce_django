@@ -6,7 +6,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>{% block title %}eCommerce{% endblock title %}</title>
+
+    <title>{% block head_title %}eCommerce{% endblock %}</title>
+    {% block extra_head %}
+    {% endblock %}
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
@@ -64,10 +67,13 @@
 
     <!--Main layout-->
     <main>
-        <div class="container pt-5">
+        <div class="container pt-5 mt-5">
 
             {% block content %}
             {% endblock content %}
+
+            {% block extra_body %}
+            {% endblock extra_body %}
 
         </div>
     </main>
