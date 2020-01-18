@@ -1,7 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Order, OrderItem, Item
 
 
@@ -70,3 +72,16 @@ def remove_from_cart(request, slug):
     else:
         messages.info(request, "You do not have an active order.")
         return redirect('core:product', slug=slug)
+
+
+
+class OrderSummaryView(LoginRequiredMixin, View):
+    template_name = 'order_summary.html'
+
+    def get(self, request, *args, **kwargs):
+        try:
+            order = Order.objects.get(user=request.user, ordered=False)
+            return render(request, 'order_summary.html', {'object': order})
+        except ObjectDoesNotExist:
+            messages.error(request, "You do not have an active order")
+            return redirect('/')

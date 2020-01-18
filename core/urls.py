@@ -17,4 +17,7 @@ urlpatterns = [
     # remove item from cart
     path('remove-from-cart/<slug>/', views.remove_from_cart,
         name='remove_from_cart'),
+
+    # order summary
+    path('order-summary/', views.OrderSummary.as_view(), name='order-summary'),
 ]
