@@ -10,4 +10,7 @@ urlpatterns = [
 
     # item detail
     path('product/<slug>/', views.ItemDetailView.as_view(), name='product'),
+
+    # add item to cart
+    path('add-to-cart/<slug>/', views.add_to_cart, name='add_to_cart'),
 ]
