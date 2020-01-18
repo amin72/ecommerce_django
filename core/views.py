@@ -8,6 +8,7 @@ from .models import Order, OrderItem, Item
 class ItemListView(ListView):
     model = Item
     template_name = 'home.html'
+    paginate_by = 20
 
 
 
