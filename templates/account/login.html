@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load crispy_forms_tags %}
 
 {% load i18n %}
 {% load account socialaccount %}
@@ -15,7 +15,7 @@
 
         <!--Grid row-->
         <div class="row wow fadeIn">
-            <div class="col-12">
+            <div class="col-6 offset-3">
                 <h1>{% trans "Sign In" %}</h1>
 
                 {% get_providers as socialaccount_providers %}
@@ -43,7 +43,7 @@
 
                 <form class="login" method="POST" action="{% url 'account_login' %}">
                     {% csrf_token %}
-                    {{ form.as_p }}
+                    {{ form | crispy }}
                     {% if redirect_field_value %}
                         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
                     {% endif %}
