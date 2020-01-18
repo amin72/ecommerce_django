@@ -40,11 +40,13 @@ class Item(models.Model):
 
 
 class OrderItem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+    ordered = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.item.title
+        return f"{self.quantity} of '{self.item.title}'"
 
 
 
