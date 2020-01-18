@@ -13,4 +13,8 @@ urlpatterns = [
 
     # add item to cart
     path('add-to-cart/<slug>/', views.add_to_cart, name='add_to_cart'),
+
+    # remove item from cart
+    path('remove-from-cart/<slug>/', views.remove_from_cart,
+        name='remove_from_cart'),
 ]
