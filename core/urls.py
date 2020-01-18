@@ -6,7 +6,7 @@ app_name = 'core'
 
 urlpatterns = [
     # item list
-    path('', views.ItemListView.as_view(), name='product-list'),
+    path('', views.ItemListView.as_view(), name='product_list'),
 
     # item detail
     path('product/<slug>/', views.ItemDetailView.as_view(), name='product'),
@@ -19,5 +19,11 @@ urlpatterns = [
         name='remove_from_cart'),
 
     # order summary
-    path('order-summary/', views.OrderSummary.as_view(), name='order-summary'),
+    path('order-summary/', views.OrderSummaryView.as_view(),
+        name='order_summary'),
+
+    # remove single item from cart
+    path('remove-single-item-from-cart/<slug>/',
+        views.remove_single_item_from_cart,
+        name='remove_single_item_from_cart'),
 ]
