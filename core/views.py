@@ -6,3 +6,9 @@ from .models import Order, OrderItem, Item
 class ItemListView(ListView):
     model = Item
     template_name = 'home.html'
+
+
+
+class ItemDetailView(DetailView):
+    model = Item
+    template_name = 'product.html'
