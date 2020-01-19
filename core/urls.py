@@ -26,4 +26,7 @@ urlpatterns = [
     path('remove-single-item-from-cart/<slug>/',
         views.remove_single_item_from_cart,
         name='remove_single_item_from_cart'),
+
+    # checkout
+    path('checkout/', views.CheckoutView.as_view(), name='checkout'),
 ]

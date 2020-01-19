@@ -4,7 +4,10 @@ from django.utils import timezone
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.mixins import LoginRequiredMixin
+
 from .models import Order, OrderItem, Item
+from .forms import CheckoutForm
+
 
 
 class ItemListView(ListView):
@@ -122,3 +125,25 @@ class OrderSummaryView(LoginRequiredMixin, View):
         except ObjectDoesNotExist:
             messages.error(request, "You do not have an active order")
             return redirect('/')
+
+
+
+class CheckoutView(View):
+    def get(self, request, *args, **kwargs):
+        # form
+        form = CheckoutForm()
+
+        context = {
+            'form': form
+        }
+        return render(request, 'checkout.html', context)
+
+    def post(self, request, *args, **kwargs):
+        form = CheckoutForm(request.POST or None)
+        print(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            print("The form is valid")
+        else:
+            print(form.errors)
+        return redirect("core:checkout")
