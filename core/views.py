@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Order, OrderItem, Item
+from .models import Order, OrderItem, Item, BillingAddress
 from .forms import CheckoutForm
 
 
@@ -140,10 +140,26 @@ class CheckoutView(View):
 
     def post(self, request, *args, **kwargs):
         form = CheckoutForm(request.POST or None)
-        print(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
-            print("The form is valid")
+            cd = form.cleaned_data
+            street_address = cd.get('stree_address')
+            apartment_address = cd.get('apartment_address')
+            country = cd.get('country')
+            zip = cd.get('zip')
+            same_shipping_address = cd.get('same_shipping_address')
+            save_info = cd.get('save_info')
+            payment_option = cd.get('payment_option')
+
+            billing_address = BillingAddress.objects.create(user=request.user,
+                street_address=street_address,
+                apartment_address=apartment_address,
+                country=country,
+                zip=zip
+            )
+
+            order.billing_address = billing_address
+            save.save()
+            return redirect('core:checkout')
         else:
             print(form.errors)
         return redirect("core:checkout")
