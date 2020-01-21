@@ -136,7 +136,7 @@
             </div>
 
             <div class="new-card-form">
-              <form action="." method="post" class="stripe-form" id="stripe-form">
+              <form method="post" class="stripe-form" id="stripe-form">
                   {% csrf_token %}
                   <div class="stripe-form-row" id="creditCard">
                       <label for="card-element" id="stripeBtnLabel">
@@ -169,7 +169,7 @@
 {% block extra_scripts %}
 
     <script nonce="">  // Create a Stripe client.
-      var stripe = Stripe('');
+      var stripe = Stripe('pk_test_q5g16dlUVvSaKuIkx9CzjdnI004U0kcgIM');
 
       // Create an instance of Elements.
       var elements = stripe.elements();
