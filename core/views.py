@@ -4,9 +4,13 @@ from django.utils import timezone
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.conf import settings
 
-from .models import Order, OrderItem, Item, BillingAddress
+from .models import Order, OrderItem, Item, BillingAddress, Payment
 from .forms import CheckoutForm
+
+import stripe
+stripe.api_key = settings.API_SECRET_KEY
 
 
 
@@ -140,9 +144,11 @@ class CheckoutView(View):
 
     def post(self, request, *args, **kwargs):
         form = CheckoutForm(request.POST or None)
+        order = Order.objects.get(user=request.user, ordered=False)
+
         if form.is_valid():
             cd = form.cleaned_data
-            street_address = cd.get('stree_address')
+            street_address = cd.get('street_address')
             apartment_address = cd.get('apartment_address')
             country = cd.get('country')
             zip = cd.get('zip')
@@ -158,8 +164,82 @@ class CheckoutView(View):
             )
 
             order.billing_address = billing_address
-            save.save()
-            return redirect('core:checkout')
+            order.save()
+
+            if payment_option == 'S':
+                return redirect('core:payment', payment_option='stripe')
+            elif payment_option == 'P':
+                return redirect('core:payment', payment_option='paypal')
+            else:
+                messages.warning(request, 'Invalid payment option selected')
+                return redirect('core:checkout')
         else:
-            print(form.errors)
-        return redirect("core:checkout")
+            return redirect("core:checkout")
+
+
+
+class PaymentView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'payment.html')
+
+    def post(self, request, *args, **kwargs):
+        token = request.POST.get('stripeToken')
+        order = Order.objects.get(user=request.user, ordered=False)
+        amount = int(order.get_total() * 100) # cents
+
+        try:
+            # Use Stripe's library to make requests...
+            charge = stripe.Charge.create(
+                amount=amount, # cents
+                currency='usd',
+                source=token,
+                # idempotency_key='sgOsfVXOkax5Ma8m'
+            )
+
+            # create the payment
+            payment = Payment.objects.create(
+                stripe_charge_id=charge['id'],
+                user=request.user,
+                amount=order.get_total()
+            )
+
+            order.ordered = True
+            order.payment = payment
+            order.save()
+
+            messages.success(request, 'Your order was successful!')
+            return redirect('core:product_list')
+
+        except stripe.error.CardError as e:
+            # Since it's a decline, stripe.error.CardError will be caught
+            messages.error(request, e.error.message)
+            return redirect('core:product_list')
+
+        except stripe.error.RateLimitError as e:
+            # Too many requests made to the API too quickly
+            messages.error(request, "Rate limit error.")
+            return redirect('core:product_list')
+
+        except stripe.error.InvalidRequestError as e:
+            # Invalid parameters were supplied to Stripe's API
+            messages.error(request, "Invalid parameters.")
+            return redirect('core:product_list')
+
+        except stripe.error.AuthenticationError as e:
+            # Authentication with Stripe's API failed
+            # (maybe you changed API keys recently)
+            messages.error(request, "Not authenticated.")
+            return redirect('core:product_list')
+
+        except stripe.error.APIConnectionError as e:
+            # Network communication with Stripe failed
+            messages.error(request, "Network error.")
+            return redirect('core:product_list')
+
+        except stripe.error.StripeError as e:
+            messages.error(request, "Something went wrong. You were not charged. Plase try again.")
+            return redirect('core:product_list')
+
+        except Exception as e:
+            messages.error(request, "A serious error occurred. We have been notified.")
+            return redirect('core:product_list')
