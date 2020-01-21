@@ -136,9 +136,11 @@ class CheckoutView(View):
     def get(self, request, *args, **kwargs):
         # form
         form = CheckoutForm()
+        order = Order.objects.get(user=request.user, ordered=False)
 
         context = {
-            'form': form
+            'form': form,
+            'order': order,
         }
         return render(request, 'checkout.html', context)
 
