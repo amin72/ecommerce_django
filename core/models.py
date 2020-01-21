@@ -79,6 +79,7 @@ class Order(models.Model):
     billing_address = models.ForeignKey('BillingAddress',
         on_delete=models.SET_NULL, null=True)
     payment = models.ForeignKey('Payment', on_delete=models.SET_NULL, null=True)
+    coupon = models.ForeignKey('Coupon', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.user.username
