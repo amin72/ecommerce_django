@@ -11,6 +11,16 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import json
+
+try:
+    f = open('settings.json')
+    settings = json.load(f)
+except FileNotFoundError:
+    print('settings.json does not exist.')
+    print('This file contains extra settings for this project.')
+    exit(0)
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -154,3 +164,7 @@ LOGIN_REDIRECT_URL = '/'
 
 # CRISPY FORMS
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
+# Stripe
+API_SECRET_KEY = settings.get('STRIPE_SECRET_KEY')
