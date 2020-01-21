@@ -209,6 +209,11 @@ class PaymentView(View):
             order.payment = payment
             order.save()
 
+            order_items = order.items.all()
+            order_items.update(ordered=True)
+            for item in order_items:
+                item.save()
+
             messages.success(request, 'Your order was successful!')
             return redirect('core:product_list')
 
