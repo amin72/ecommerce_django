@@ -10,7 +10,7 @@ from .models import (
     Order,
     OrderItem,
     Item,
-    BillingAddress,
+    Address,
     Payment,
     Coupon,
     Refund,
@@ -179,11 +179,12 @@ class CheckoutView(View):
             # save_info = cd.get('save_info')
             payment_option = cd.get('payment_option')
 
-            billing_address = BillingAddress.objects.create(user=request.user,
+            billing_address = Address.objects.create(user=request.user,
                 street_address=street_address,
                 apartment_address=apartment_address,
                 country=country,
-                zip=zip
+                zip=zip,
+                address_type='B'
             )
 
             order.billing_address = billing_address
