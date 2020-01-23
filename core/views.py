@@ -192,15 +192,18 @@ class CheckoutView(View):
 class PaymentView(View):
     def get(self, request, *args, **kwargs):
         order = Order.objects.get(user=request.user, ordered=False)
-        coupon_form = CouponForm()
 
-        context = {
-            'order': order,
-            'coupon_form': coupon_form,
-            'DISPLAY_COUPON_FORM': False,
-        }
+        if order.billing_address:
+            context = {
+                'order': order,
+                'DISPLAY_COUPON_FORM': False,
+            }
 
-        return render(request, 'payment.html', context)
+            return render(request, 'payment.html', context)
+        else:
+            messages.warning(request, "You have not added a billing address")
+            return redirect("core:checkout")
+
 
     def post(self, request, *args, **kwargs):
         token = request.POST.get('stripeToken')
@@ -237,36 +240,36 @@ class PaymentView(View):
 
         except stripe.error.CardError as e:
             # Since it's a decline, stripe.error.CardError will be caught
-            messages.error(request, e.error.message)
+            messages.warning(request, e.error.message)
             return redirect('core:product_list')
 
         except stripe.error.RateLimitError as e:
             # Too many requests made to the API too quickly
-            messages.error(request, "Rate limit error.")
+            messages.warning(request, "Rate limit error.")
             return redirect('core:product_list')
 
         except stripe.error.InvalidRequestError as e:
             # Invalid parameters were supplied to Stripe's API
-            messages.error(request, "Invalid parameters.")
+            messages.warning(request, "Invalid parameters.")
             return redirect('core:product_list')
 
         except stripe.error.AuthenticationError as e:
             # Authentication with Stripe's API failed
             # (maybe you changed API keys recently)
-            messages.error(request, "Not authenticated.")
+            messages.warning(request, "Not authenticated.")
             return redirect('core:product_list')
 
         except stripe.error.APIConnectionError as e:
             # Network communication with Stripe failed
-            messages.error(request, "Network error.")
+            messages.warning(request, "Network error.")
             return redirect('core:product_list')
 
         except stripe.error.StripeError as e:
-            messages.error(request, "Something went wrong. You were not charged. Plase try again.")
+            messages.warning(request, "Something went wrong. You were not charged. Plase try again.")
             return redirect('core:product_list')
 
         except Exception as e:
-            messages.error(request, "A serious error occurred. We have been notified.")
+            messages.warning(request, "A serious error occurred. We have been notified.")
             return redirect('core:product_list')
 
 
