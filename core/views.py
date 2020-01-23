@@ -19,6 +19,13 @@ from .forms import CheckoutForm, CouponForm
 import stripe
 stripe.api_key = settings.API_SECRET_KEY
 
+import string
+import random
+
+
+def create_ref_code():
+    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=24))
+
 
 
 class ItemListView(ListView):
@@ -228,6 +235,7 @@ class PaymentView(View):
 
             order.ordered = True
             order.payment = payment
+            order.ref_code = create_ref_code()
             order.save()
 
             order_items = order.items.all()
