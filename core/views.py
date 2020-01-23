@@ -12,9 +12,14 @@ from .models import (
     Item,
     BillingAddress,
     Payment,
-    Coupon
+    Coupon,
+    Refund,
 )
-from .forms import CheckoutForm, CouponForm
+from .forms import (
+    CheckoutForm,
+    CouponForm,
+    RefundForm,
+)
 
 import stripe
 stripe.api_key = settings.API_SECRET_KEY
@@ -309,3 +314,42 @@ class AddCoupon(View):
                 return redirect('core:checkout')
         messages.warning(request, "Could not process the request!")
         return redirect("core:checkout")
+
+
+
+class RequestRefundView(View):
+    def get(self, request, *args, **kwargs):
+        form = RefundForm()
+        context = {
+            'form': form,
+        }
+        return render(request, 'request_refund.html', context)
+
+
+    def post(self, request, *args, **kwargs):
+        form = RefundForm(request.POST or None)
+        if form.is_valid():
+            cd = form.cleaned_data
+            ref_code = cd.get('ref_code')
+            message = cd.get('message')
+            email = cd.get('email')
+            
+            # edit the order
+            try:
+                order = Order.objects.get(ref_code=ref_code)
+                order.refund_requested = True
+                order.save()
+
+                # store the refund
+                refund = Refund()
+                refund.order = order
+                refund.reason = message
+                refund.email = email
+                refund.save()
+
+                messages.success(request, 'Your request was received.')
+                return redirect('core:request_refund')
+
+            except ObjectDoesNotExist:
+                messages.warning(request, 'This order does not exist.')
+                return redirect('core:request_refund')

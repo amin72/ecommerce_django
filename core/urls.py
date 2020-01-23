@@ -36,4 +36,9 @@ urlpatterns = [
 
     # add coupon
     path('add_coupon/', views.AddCoupon.as_view(), name='add_coupon'),
+
+
+    # request refund
+    path('request-refund/', views.RequestRefundView.as_view(),
+        name='request_refund'),
 ]
