@@ -33,4 +33,7 @@ urlpatterns = [
     # payment
     path('payment/<payment_option>/', views.PaymentView.as_view(),
         name='payment'),
+
+    # add coupon
+    path('add_coupon/', views.add_coupon, name='add_coupon'),
 ]

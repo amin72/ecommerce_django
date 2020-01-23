@@ -6,8 +6,15 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 
-from .models import Order, OrderItem, Item, BillingAddress, Payment
-from .forms import CheckoutForm
+from .models import (
+    Order,
+    OrderItem,
+    Item,
+    BillingAddress,
+    Payment,
+    Coupon
+)
+from .forms import CheckoutForm, CouponForm
 
 import stripe
 stripe.api_key = settings.API_SECRET_KEY
@@ -134,13 +141,15 @@ class OrderSummaryView(LoginRequiredMixin, View):
 
 class CheckoutView(View):
     def get(self, request, *args, **kwargs):
-        # form
         form = CheckoutForm()
         order = Order.objects.get(user=request.user, ordered=False)
+        coupon_form = CouponForm()
 
         context = {
             'form': form,
             'order': order,
+            'coupon_form': coupon_form,
+            'DISPLAY_COUPON_FORM': True,
         }
         return render(request, 'checkout.html', context)
 
@@ -154,8 +163,8 @@ class CheckoutView(View):
             apartment_address = cd.get('apartment_address')
             country = cd.get('country')
             zip = cd.get('zip')
-            same_shipping_address = cd.get('same_shipping_address')
-            save_info = cd.get('save_info')
+            # same_shipping_address = cd.get('same_shipping_address')
+            # save_info = cd.get('save_info')
             payment_option = cd.get('payment_option')
 
             billing_address = BillingAddress.objects.create(user=request.user,
@@ -182,7 +191,16 @@ class CheckoutView(View):
 
 class PaymentView(View):
     def get(self, request, *args, **kwargs):
-        return render(request, 'payment.html')
+        order = Order.objects.get(user=request.user, ordered=False)
+        coupon_form = CouponForm()
+
+        context = {
+            'order': order,
+            'coupon_form': coupon_form,
+            'DISPLAY_COUPON_FORM': False,
+        }
+
+        return render(request, 'payment.html', context)
 
     def post(self, request, *args, **kwargs):
         token = request.POST.get('stripeToken')
@@ -250,3 +268,33 @@ class PaymentView(View):
         except Exception as e:
             messages.error(request, "A serious error occurred. We have been notified.")
             return redirect('core:product_list')
+
+
+
+def get_coupon(request, code):
+    try:
+        coupon = Coupon.objects.get(code=code)
+        return coupon
+    except ObjectDoesNotExist:
+        messages.info(request, "This coupon does not exist.")
+        return redirect('core:checkout')
+
+
+
+def add_coupon(request):
+    if request.method == 'POST':
+        form = CouponForm(request.POST or None)
+        if form.is_valid():
+            try:
+                code = form.cleaned_data.get('code')
+                order = Order.objects.get(user=request.user, ordered=False)
+                coupon = get_coupon(request, code)
+                order.coupon = coupon
+                order.save()
+                messages.success(request, "Successfully added coupon.")
+                return redirect('core:checkout')
+            except ObjectDoesNotExist:
+                messages.info(request, "You do not have an active order")
+                return redirect('core:checkout')
+    # raise error
+    return None
