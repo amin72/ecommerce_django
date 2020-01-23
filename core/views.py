@@ -284,8 +284,8 @@ def get_coupon(request, code):
 
 
 
-def add_coupon(request):
-    if request.method == 'POST':
+class AddCoupon(View):
+    def post(self, request, *args, **kwargs):
         form = CouponForm(request.POST or None)
         if form.is_valid():
             try:
@@ -299,5 +299,5 @@ def add_coupon(request):
             except ObjectDoesNotExist:
                 messages.info(request, "You do not have an active order")
                 return redirect('core:checkout')
-    # raise error
-    return None
+        messages.warning(request, "Could not process the request!")
+        return redirect("core:checkout")

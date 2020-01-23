@@ -35,5 +35,5 @@ urlpatterns = [
         name='payment'),
 
     # add coupon
-    path('add_coupon/', views.add_coupon, name='add_coupon'),
+    path('add_coupon/', views.AddCoupon.as_view(), name='add_coupon'),
 ]
