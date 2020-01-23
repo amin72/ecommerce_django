@@ -19,6 +19,12 @@ LABEL_CHOICES = (
     ('D', 'danger'),
 )
 
+ADDRESS_CHOICES = (
+    ('B', 'Billing'),
+    ('S', 'Shipping'),
+)
+
+
 
 class Item(models.Model):
     title = models.CharField(max_length=100)
@@ -76,8 +82,15 @@ class Order(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
-    billing_address = models.ForeignKey('BillingAddress',
+    
+    shipping_address = models.ForeignKey('Address',
+        related_name='shipping_address',
         on_delete=models.SET_NULL, null=True)
+    
+    billing_address = models.ForeignKey('Address',
+        related_name='billing_address',
+        on_delete=models.SET_NULL, null=True)
+    
     payment = models.ForeignKey('Payment', on_delete=models.SET_NULL, null=True)
     coupon = models.ForeignKey('Coupon', on_delete=models.SET_NULL, null=True)
     being_delivered = models.BooleanField(default=False)
@@ -102,12 +115,14 @@ class Order(models.Model):
 
 
 
-class BillingAddress(models.Model):
+class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     street_address = models.CharField(max_length=100)
     apartment_address = models.CharField(max_length=100)
     country = CountryField(multiple=False)
     zip = models.CharField(max_length=100)
+    address_type = models.CharField(max_length=1, choices=ADDRESS_CHOICES)
+    default = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
