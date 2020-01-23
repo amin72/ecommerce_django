@@ -80,6 +80,10 @@ class Order(models.Model):
         on_delete=models.SET_NULL, null=True)
     payment = models.ForeignKey('Payment', on_delete=models.SET_NULL, null=True)
     coupon = models.ForeignKey('Coupon', on_delete=models.SET_NULL, null=True)
+    being_delivered = models.BooleanField(default=False)
+    received = models.BooleanField(default=False)
+    refund_requested = models.BooleanField(default=False)
+    refund_granted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
