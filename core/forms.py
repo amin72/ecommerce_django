@@ -8,6 +8,8 @@ PAYMENT_CHOICES = (
     ('P', 'Paypal'),
 )
 
+
+
 class CheckoutForm(forms.Form):
     shipping_address = forms.CharField(required=False)
     shipping_address2 = forms.CharField(required=False)

@@ -149,6 +149,8 @@
         var use_default_shipping = document.querySelector("input[name=use_default_shipping]");
         var use_default_billing = document.querySelector("input[name=use_default_billing]");
 
+        console.log(use_default_shipping)
+        console.log(use_default_billing)
         use_default_shipping.addEventListener('change', function() {
         if (this.checked) {
             hideable_shipping_form.hide();
