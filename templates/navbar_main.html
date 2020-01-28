@@ -22,29 +22,29 @@
             </ul>
 
             <!-- Right -->
-            <ul class="navbar-nav nav-flex-icons">
+            <ul class="navbar-nav">
                 {% if request.user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link waves-effect" href="{% url 'core:order_summary' %}">
-                            <span class="badge red z-depth-1 mr-1"> {{ request.user | cart_item_count }} </span>
+                            <span class="badge red mr-1"> {{ request.user | cart_item_count }} </span>
                             <i class="fas fa-shopping-cart"></i>
                             <span class="clearfix d-none d-sm-inline-block"> Cart </span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{% url 'account_logout' %}" class="nav-link waves-effect">
-                            <span class="clearfix d-none d-sm-inline-block"> Logout </span>
+                            <span class="clearfix d-sm-inline-block"> Logout </span>
                         </a>
                     </li>
                 {% else %}
                     <li class="nav-item">
                         <a href="{% url 'account_login' %}" class="nav-link waves-effect">
-                            <span class="clearfix d-none d-sm-inline-block"> Login </span>
+                            <span class="clearfix d-sm-inline-block"> Login </span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{% url 'account_signup' %}" class="nav-link waves-effect">
-                            <span class="clearfix d-none d-sm-inline-block"> Sign up </span>
+                            <span class="clearfix d-sm-inline-block"> Sign up </span>
                         </a>
                     </li>
                 {% endif %}

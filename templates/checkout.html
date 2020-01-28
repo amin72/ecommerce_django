@@ -151,21 +151,26 @@
 
         console.log(use_default_shipping)
         console.log(use_default_billing)
-        use_default_shipping.addEventListener('change', function() {
-        if (this.checked) {
-            hideable_shipping_form.hide();
-        } else {
-            hideable_shipping_form.show();
-        }
-        })
 
-        use_default_billing.addEventListener('change', function() {
-        if (this.checked) {
-            hideable_billing_form.hide();
-        } else {
-            hideable_billing_form.show();
+        if (use_default_shipping !== null) {
+          use_default_shipping.addEventListener('change', function() {
+            if (this.checked) {
+                hideable_shipping_form.hide();
+            } else {
+                hideable_shipping_form.show();
+            }
+          })
         }
-        })
+
+        if (use_default_billing !== null) {
+          use_default_billing.addEventListener('change', function() {
+            if (this.checked) {
+                hideable_billing_form.hide();
+            } else {
+                hideable_billing_form.show();
+            }
+          })
+        }
 
     </script>
 {% endblock extra_scripts %}
