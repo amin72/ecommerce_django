@@ -168,3 +168,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Stripe
 API_SECRET_KEY = settings.get('STRIPE_SECRET_KEY')
+
+
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
