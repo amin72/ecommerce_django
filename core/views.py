@@ -40,6 +40,14 @@ class ItemListView(ListView):
     template_name = 'home.html'
     paginate_by = 20
 
+    def get_queryset(self):
+        category = self.request.GET.get('category')
+        queryset = super().get_queryset()
+        if category:
+            queryset = super().get_queryset().filter(category=category)
+        return queryset
+
+
 
 
 class ItemDetailView(DetailView):
