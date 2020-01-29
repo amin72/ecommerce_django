@@ -5,6 +5,8 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
+from django.db.models import Q
+
 
 from .models import (
     Order,
@@ -42,11 +44,18 @@ class ItemListView(ListView):
 
     def get_queryset(self):
         category = self.request.GET.get('category')
-        queryset = super().get_queryset()
-        if category:
-            queryset = super().get_queryset().filter(category=category)
-        return queryset
+        q = self.request.GET.get('q') # search
 
+        queryset = super().get_queryset()
+
+        if category:
+            queryset = queryset.filter(category=category.upper())
+
+        if q:
+            query = (Q(title__icontains=q) | Q(description__icontains=q))
+            queryset = queryset.filter(query)
+
+        return queryset
 
 
 
